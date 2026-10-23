@@ -1,78 +1,525 @@
-import tkinter as tk
-from tkinter import font
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مكتب القزاز للبرمجيات - الآلة الحاسبة الذكية</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Font: Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-class ElKazzazCalculator:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("الآلة الحاسبة - مكتب القزاز للبرمجيات")
-        self.root.geometry("350x500")
-        self.root.resizable(False, False)
-        self.root.configure(bg="#0f172a")
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              accent: '#38bdf8'
+            },
+            darkbg: '#0f172a',
+            darkcard: '#1e293b',
+            darkscreen: '#020617',
+          },
+          fontFamily: {
+            sans: ['Cairo', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
 
-        self.expression = ""
-        self.input_text = tk.StringVar()
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    /* Smooth Scrollbar for History */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #0ea5e9;
+    }
 
-        # إطار الشاشة (Display)
-        display_frame = tk.Frame(self.root, bg="#0f172a", height=100)
-        display_frame.pack(pack_propagate=False, fill=tk.BOTH)
+    /* Active key feedback animation */
+    .calc-btn {
+      transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .calc-btn:active {
+      transform: scale(0.94);
+    }
+    .calc-btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .calc-btn:active::after {
+      transform: translate(-50%, -50%) scale(2);
+      opacity: 1;
+      transition: 0s;
+    }
 
-        # شاشة عرض الأرقام والعمليات
-        custom_font = font.Font(family="Tahoma", size=24, weight="bold")
-        input_field = tk.Entry(display_frame, textvariable=self.input_text, font=custom_font, 
-                               bg="#1e293b", fg="#ffffff", bd=0, justify=tk.RIGHT)
-        input_field.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+    /* Glow effect for main action */
+    .glow-primary {
+      box-shadow: 0 0 20px rgba(14, 165, 233, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
 
-        # إطار الأزرار
-        buttons_frame = tk.Frame(self.root, bg="#0f172a")
-        buttons_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+  <!-- Header Section -->
+  <header class="w-full bg-darkcard/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-4 py-3 shadow-lg">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-accent flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+          <i class="fa-solid fa-calculator text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-white tracking-wide leading-tight">مكتب القزاز للبرمجيات</h1>
+          <p class="text-xs text-brand-accent font-medium">El-Kazzaz Software Office</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-xs text-slate-400 bg-darkscreen/50 px-3 py-1.5 rounded-full border border-slate-800">
+        <span class="flex h-2 w-2 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span>النسخة التفاعلية للمتصفح v2.0</span>
+      </div>
+    </div>
+  </header>
 
-        # تصميم الأزرار
-        buttons = [
-            ('C', 1, 0, "#ef4444"), ('⌫', 1, 1, "#64748b"), ('%', 1, 2, "#64748b"), ('/', 1, 3, "#f59e0b"),
-            ('7', 2, 0, "#334155"), ('8', 2, 1, "#334155"), ('9', 2, 2, "#334155"), ('*', 2, 3, "#f59e0b"),
-            ('4', 3, 0, "#334155"), ('5', 3, 1, "#334155"), ('6', 3, 2, "#334155"), ('-', 3, 3, "#f59e0b"),
-            ('1', 4, 0, "#334155"), ('2', 4, 1, "#334155"), ('3', 4, 2, "#334155"), ('+', 4, 3, "#f59e0b"),
-            ('0', 5, 0, "#334155"), ('.', 5, 1, "#334155"), ('=', 5, 2, 2, "#2563eb")
-        ]
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- Calculator Container (Left/Center) -->
+      <div class="lg:col-span-8 bg-darkcard/90 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-sm relative overflow-hidden">
+        <!-- Ambient Light -->
+        <div class="absolute -top-24 -right-24 w-60 h-60 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        for btn in buttons:
-            text = btn[0]
-            row = btn[1]
-            col = btn[2]
-            bg_color = btn[3]
-            colspan = btn[4] if len(btn) > 4 else 1
+        <!-- Screen Area -->
+        <div class="bg-darkscreen rounded-2xl p-4 mb-5 border border-slate-800/80 shadow-inner flex flex-col justify-between min-h-[130px] relative">
+          <!-- Top indicators & Expression -->
+          <div class="flex items-center justify-between text-slate-400 text-xs sm:text-sm font-mono mb-1">
+            <span id="deg-rad-indicator" class="bg-slate-800/80 px-2 py-0.5 rounded text-[10px] font-sans text-brand-accent border border-slate-700/50">DEG</span>
+            <div id="expression-display" class="overflow-x-auto whitespace-nowrap custom-scrollbar text-left dir-ltr max-w-[85%] text-slate-400 font-mono tracking-wider h-6">
+              <!-- Expression output -->
+            </div>
+          </div>
 
-            button = tk.Button(buttons_frame, text=text, font=("Tahoma", 16, "bold"),
-                               fg="#ffffff", bg=bg_color, bd=0, activebackground="#475569",
-                               command=lambda t=text: self.on_button_click(t))
-            
-            button.grid(row=row, column=col, columnspan=colspan, sticky="nsew", padx=4, pady=4)
+          <!-- Main Input / Result Display -->
+          <div class="flex items-center justify-end w-full overflow-hidden">
+            <input 
+              type="text" 
+              id="main-display" 
+              value="0" 
+              readonly 
+              class="w-full bg-transparent text-right text-3xl sm:text-5xl font-extrabold text-white font-mono tracking-tight focus:outline-none select-all dir-ltr overflow-x-auto"
+            />
+          </div>
+        </div>
 
-        for i in range(4):
-            buttons_frame.columnconfigure(i, weight=1)
-        for i in range(6):
-            buttons_frame.rowconfigure(i, weight=1)
+        <!-- Controls Row -->
+        <div class="flex items-center justify-between gap-2 mb-4 px-1">
+          <button onclick="toggleScientific()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition border border-slate-700/50 flex items-center gap-1.5">
+            <i class="fa-solid fa-flask text-brand-accent"></i>
+            <span id="sci-toggle-text">الوظائف المتقدمة</span>
+          </button>
+          
+          <button onclick="clearHistory()" class="text-xs text-slate-400 hover:text-rose-400 transition flex items-center gap-1 lg:hidden">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>مسح السجل</span>
+          </button>
+        </div>
 
-    def on_button_click(self, char):
-        if char == 'C':
-            self.expression = ""
-            self.input_text.set("")
-        elif char == '⌫':
-            self.expression = self.expression[:-1]
-            self.input_text.set(self.expression)
-        elif char == '=':
-            try:
-                result = str(eval(self.expression))
-                self.input_text.set(result)
-                self.expression = result
-            except Exception:
-                self.input_text.set("خطأ")
-                self.expression = ""
-        else:
-            self.expression += str(char)
-            self.input_text.set(self.expression)
+        <!-- Scientific Extension Grid (Expandable) -->
+        <div id="scientific-grid" class="hidden grid grid-cols-5 gap-2 mb-3 transition-all duration-300">
+          <button onclick="appendFunction('sin')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">sin</button>
+          <button onclick="appendFunction('cos')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">cos</button>
+          <button onclick="appendFunction('tan')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">tan</button>
+          <button onclick="appendOperator('**')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">xⁿ</button>
+          <button onclick="appendConstant('PI')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">π</button>
+          
+          <button onclick="appendFunction('sqrt')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">√x</button>
+          <button onclick="appendFunction('log')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">log</button>
+          <button onclick="appendFunction('ln')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">ln</button>
+          <button onclick="appendParentheses('(')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">(</button>
+          <button onclick="appendParentheses(')')" class="calc-btn py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-semibold border border-slate-700/40">)</button>
+        </div>
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = ElKazzazCalculator(root)
-    root.mainloop()
+        <!-- Keypad Grid -->
+        <div class="grid grid-cols-4 gap-2.5 sm:gap-3">
+          <!-- Row 1 -->
+          <button onclick="clearAll()" class="calc-btn py-3 sm:py-4 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold text-lg sm:text-xl border border-rose-500/30">C</button>
+          <button onclick="deleteLast()" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-lg sm:text-xl border border-slate-700/50"><i class="fa-solid fa-delete-left"></i></button>
+          <button onclick="appendOperator('%')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-brand-accent font-bold text-lg sm:text-xl border border-slate-700/50">%</button>
+          <button onclick="appendOperator('/')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-brand-600/30 hover:bg-brand-600/50 text-brand-accent font-bold text-xl border border-brand-500/30">÷</button>
+
+          <!-- Row 2 -->
+          <button onclick="appendNumber('7')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">7</button>
+          <button onclick="appendNumber('8')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">8</button>
+          <button onclick="appendNumber('9')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">9</button>
+          <button onclick="appendOperator('*')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-brand-600/30 hover:bg-brand-600/50 text-brand-accent font-bold text-xl border border-brand-500/30">×</button>
+
+          <!-- Row 3 -->
+          <button onclick="appendNumber('4')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">4</button>
+          <button onclick="appendNumber('5')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">5</button>
+          <button onclick="appendNumber('6')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">6</button>
+          <button onclick="appendOperator('-')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-brand-600/30 hover:bg-brand-600/50 text-brand-accent font-bold text-xl border border-brand-500/30">−</button>
+
+          <!-- Row 4 -->
+          <button onclick="appendNumber('1')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">1</button>
+          <button onclick="appendNumber('2')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">2</button>
+          <button onclick="appendNumber('3')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">3</button>
+          <button onclick="appendOperator('+')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-brand-600/30 hover:bg-brand-600/50 text-brand-accent font-bold text-xl border border-brand-500/30">+</button>
+
+          <!-- Row 5 -->
+          <button onclick="toggleSign()" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-lg border border-slate-700/40">±</button>
+          <button onclick="appendNumber('0')" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">0</button>
+          <button onclick="appendDecimal()" class="calc-btn py-3 sm:py-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xl border border-slate-700/40">.</button>
+          <button onclick="calculate()" class="calc-btn py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold text-2xl border border-brand-400/40 glow-primary">=</button>
+        </div>
+      </div>
+
+      <!-- History Panel (Right Side Desktop / Bottom Mobile) -->
+      <div class="lg:col-span-4 bg-darkcard/90 border border-slate-800 rounded-3xl p-5 shadow-2xl backdrop-blur-sm flex flex-col h-full min-h-[350px] lg:min-h-[520px]">
+        
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2 text-white font-bold">
+            <i class="fa-solid fa-clock-rotate-left text-brand-accent"></i>
+            <h2>سجل العمليات</h2>
+          </div>
+          <button onclick="clearHistory()" class="text-xs text-slate-400 hover:text-rose-400 transition flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-800">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>مسح السجل</span>
+          </button>
+        </div>
+
+        <!-- History Items Container -->
+        <div id="history-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-2.5 pr-1 text-left dir-ltr">
+          <div class="text-center text-slate-500 my-auto py-12 text-sm font-sans dir-rtl">
+            <i class="fa-solid fa-receipt text-3xl mb-2 opacity-30"></i>
+            <p>لا توجد عمليات حسابية سابقة</p>
+          </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="mt-4 pt-3 border-t border-slate-800/80 text-center text-[11px] text-slate-500">
+          <p>مكتب القزاز للبرمجيات &copy; 2026</p>
+          <p class="text-[10px] text-slate-600">جميع الحقوق محفوظة - GitHub Pages Ready</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-4 py-2.5 rounded-xl border border-slate-700 shadow-2xl transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2 z-50">
+    <i class="fa-solid fa-circle-info text-brand-accent"></i>
+    <span id="toast-message">تم نسخ النتيجة إلى الحافظة</span>
+  </div>
+
+  <!-- JavaScript Calculator Core Logic -->
+  <script>
+    let currentInput = '0';
+    let currentExpression = '';
+    let shouldResetDisplay = false;
+    let history = [];
+
+    const mainDisplay = document.getElementById('main-display');
+    const expressionDisplay = document.getElementById('expression-display');
+    const historyList = document.getElementById('history-list');
+
+    // Load history from LocalStorage
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedHistory = localStorage.getItem('el_kazzaz_calc_history');
+      if (savedHistory) {
+        try {
+          history = JSON.parse(savedHistory);
+          renderHistory();
+        } catch(e) {
+          history = [];
+        }
+      }
+    });
+
+    function updateDisplay() {
+      mainDisplay.value = currentInput;
+      expressionDisplay.innerText = currentExpression;
+    }
+
+    function appendNumber(num) {
+      if (currentInput === '0' || shouldResetDisplay) {
+        currentInput = num;
+        shouldResetDisplay = false;
+      } else {
+        if (currentInput.length < 16) {
+          currentInput += num;
+        }
+      }
+      updateDisplay();
+    }
+
+    function appendDecimal() {
+      if (shouldResetDisplay) {
+        currentInput = '0.';
+        shouldResetDisplay = false;
+      } else if (!currentInput.includes('.')) {
+        currentInput += '.';
+      }
+      updateDisplay();
+    }
+
+    function appendOperator(op) {
+      if (shouldResetDisplay) {
+        shouldResetDisplay = false;
+      }
+
+      const lastChar = currentExpression.slice(-1);
+      if (['+', '-', '*', '/', '%'].includes(lastChar) && currentInput === '') {
+        currentExpression = currentExpression.slice(0, -1) + op;
+      } else {
+        currentExpression += ` ${currentInput} ${op}`;
+        currentInput = '0';
+      }
+      updateDisplay();
+    }
+
+    function appendFunction(func) {
+      currentExpression += ` ${func}(${currentInput})`;
+      currentInput = '0';
+      shouldResetDisplay = true;
+      updateDisplay();
+    }
+
+    function appendConstant(constName) {
+      if (constName === 'PI') {
+        currentInput = Math.PI.toString();
+        shouldResetDisplay = true;
+      }
+      updateDisplay();
+    }
+
+    function appendParentheses(p) {
+      if (p === '(') {
+        currentExpression += ` (`;
+      } else {
+        currentExpression += ` ${currentInput} )`;
+        currentInput = '0';
+      }
+      updateDisplay();
+    }
+
+    function toggleSign() {
+      if (currentInput !== '0') {
+        if (currentInput.startsWith('-')) {
+          currentInput = currentInput.slice(1);
+        } else {
+          currentInput = '-' + currentInput;
+        }
+        updateDisplay();
+      }
+    }
+
+    function deleteLast() {
+      if (shouldResetDisplay) return;
+      if (currentInput.length > 1) {
+        currentInput = currentInput.slice(0, -1);
+      } else {
+        currentInput = '0';
+      }
+      updateDisplay();
+    }
+
+    function clearAll() {
+      currentInput = '0';
+      currentExpression = '';
+      shouldResetDisplay = false;
+      updateDisplay();
+    }
+
+    function calculate() {
+      let fullExpr = currentExpression;
+      if (currentInput !== '' && !shouldResetDisplay) {
+        fullExpr += ` ${currentInput}`;
+      }
+
+      if (!fullExpr.trim()) return;
+
+      try {
+        let evalExpr = fullExpr
+          .replace(/×/g, '*')
+          .replace(/÷/g, '/')
+          .replace(/sin\(([^)]+)\)/g, 'Math.sin($1 * Math.PI / 180)')
+          .replace(/cos\(([^)]+)\)/g, 'Math.cos($1 * Math.PI / 180)')
+          .replace(/tan\(([^)]+)\)/g, 'Math.tan($1 * Math.PI / 180)')
+          .replace(/sqrt\(([^)]+)\)/g, 'Math.sqrt($1)')
+          .replace(/log\(([^)]+)\)/g, 'Math.log10($1)')
+          .replace(/ln\(([^)]+)\)/g, 'Math.log($1)');
+
+        let result = eval(evalExpr);
+
+        if (typeof result === 'number') {
+          if (!isFinite(result)) {
+            showToast('لا يمكن القسمة على صفر');
+            return;
+          }
+          // Precision handle
+          result = Math.round(result * 1e10) / 1e10;
+        }
+
+        // Save History
+        addHistoryItem(fullExpr, result);
+
+        currentExpression = '';
+        currentInput = result.toString();
+        shouldResetDisplay = true;
+        updateDisplay();
+
+      } catch (error) {
+        mainDisplay.value = 'خطأ';
+        shouldResetDisplay = true;
+      }
+    }
+
+    // History Functions
+    function addHistoryItem(expr, result) {
+      const item = {
+        expression: expr,
+        result: result,
+        timestamp: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+      };
+      history.unshift(item);
+      if (history.length > 20) history.pop();
+      
+      localStorage.setItem('el_kazzaz_calc_history', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      if (history.length === 0) {
+        historyList.innerHTML = `
+          <div class="text-center text-slate-500 my-auto py-12 text-sm font-sans dir-rtl">
+            <i class="fa-solid fa-receipt text-3xl mb-2 opacity-30"></i>
+            <p>لا توجد عمليات حسابية سابقة</p>
+          </div>
+        `;
+        return;
+      }
+
+      historyList.innerHTML = history.map((item, index) => `
+        <div onclick="useHistoryResult('${item.result}')" class="bg-darkscreen/60 hover:bg-slate-800/80 p-3 rounded-xl border border-slate-800/80 transition cursor-pointer group">
+          <div class="flex justify-between items-center text-[10px] text-slate-500 mb-1 font-sans dir-rtl">
+            <span>عملية حسابية</span>
+            <span>${item.timestamp}</span>
+          </div>
+          <div class="text-slate-400 text-xs font-mono truncate mb-0.5 dir-ltr">${item.expression} =</div>
+          <div class="text-brand-accent text-base font-bold font-mono dir-ltr flex justify-between items-center">
+            <span>${item.result}</span>
+            <i class="fa-regular fa-copy text-xs text-slate-600 group-hover:text-brand-accent transition"></i>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function useHistoryResult(val) {
+      currentInput = val.toString();
+      shouldResetDisplay = true;
+      updateDisplay();
+      showToast('تم استعادة النتيجة للآلة الحاسبة');
+    }
+
+    function clearHistory() {
+      history = [];
+      localStorage.removeItem('el_kazzaz_calc_history');
+      renderHistory();
+      showToast('تم مسح سجل العمليات');
+    }
+
+    // Toggle Scientific Section
+    function toggleScientific() {
+      const sciGrid = document.getElementById('scientific-grid');
+      const sciText = document.getElementById('sci-toggle-text');
+      if (sciGrid.classList.contains('hidden')) {
+        sciGrid.classList.remove('hidden');
+        sciText.innerText = 'إخفاء المتقدمة';
+      } else {
+        sciGrid.classList.add('hidden');
+        sciText.innerText = 'الوظائف المتقدمة';
+      }
+    }
+
+    // Keyboard Shortcuts Support
+    document.addEventListener('keydown', (e) => {
+      if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
+      if (e.key === '.') appendDecimal();
+      if (e.key === '+') appendOperator('+');
+      if (e.key === '-') appendOperator('-');
+      if (e.key === '*') appendOperator('*');
+      if (e.key === '/') { e.preventDefault(); appendOperator('/'); }
+      if (e.key === '%') appendOperator('%');
+      if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); calculate(); }
+      if (e.key === 'Backspace') deleteLast();
+      if (e.key === 'Escape') clearAll();
+    });
+
+    // Toast Notification
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.innerText = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
+```
+
+### 📲 خطوات التشغيل والرفع على GitHub Pages بنفسك:
+
+1. قم بإنشاء ملف جديد داخل المستودع الخاص بك على **GitHub** وسمّه **`index.html`** (بحروف صغيرة تماماً).
+2. انسخ الكود أعلاه بالكامل والصقه داخل الملف واضغط **`Commit changes`**.
+3. اذهب إلى **Settings -> Pages** واختر الفرع الرئيسي `main` واضغط **Save**.
+4. انتظر دقيقة واحدة وافتح رابط الموقع (`y651-ux.github.io`) وستعمل الآلة الحاسبة التفاعلية فوراً بدون أي خطأ 404!
+```
